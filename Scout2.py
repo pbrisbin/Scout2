@@ -50,10 +50,13 @@ def main(args):
         return 42
 
     # Search for AWS credentials
-    if not args.fetch_local:
-        key_id, secret, token = read_creds(args.profile[0], args.csv_credentials[0], args.mfa_serial[0], args.mfa_code[0])
-        if key_id is None:
-            return 42
+    # if not args.fetch_local:
+    #     key_id, secret, token = read_creds(args.profile[0], args.csv_credentials[0], args.mfa_serial[0], args.mfa_code[0])
+    #     if key_id is None:
+    #         return 42
+    key_id = os.environ['AWS_ACCESS_KEY_ID']
+    secret = os.environ['AWS_SECRET_ACCESS_KEY']
+    token = None
 
     # If local analysis, overwrite results
     if args.fetch_local:
