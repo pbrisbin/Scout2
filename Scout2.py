@@ -3,6 +3,7 @@
 # Import stock packages
 import datetime
 import dateutil
+import json
 import sys
 
 # Import opinel
@@ -179,11 +180,25 @@ def main(args):
     aws_config['last_run']['cmd'] = ' '.join(sys.argv)
     aws_config['last_run']['version'] = __version__
 
+    if args.json:
+        printInfo('Writing to results.json')
+        fp = open('results.json', 'w')
+        print json.dump(aws_config, fp, default=json_helper)
+        fp.close()
+        sys.exit()
+
     # Generate dashboard metadata
     create_report_metadata(aws_config, services)
 
     # Save data
     create_scout_report(environment_name, aws_config, args.force_write, args.debug)
+
+
+def json_helper(obj):
+    """JSON serialization for datetime values"""
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    raise TypeError("Type not serializable")
 
 
 ########################################
@@ -233,6 +248,11 @@ parser.add_argument('--update',
                     default=False,
                     action='store_true',
                     help='Reload all the existing data and only overwrite data in scope for this run')
+parser.add_argument('--json',
+                    dest='json',
+                    default=False,
+                    action='store_true',
+                    help='Output violation information as results.json')
 
 args = parser.parse_args()
 
